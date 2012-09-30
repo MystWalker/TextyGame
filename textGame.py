@@ -34,7 +34,7 @@ class TextGame():
         #Print output from focus
         #loop
     def getInput(self):
-        thing = input("TYPE SOMESHIEIHTDGSHOJS>>")
+        thing = input("--->>")
         return thing
 
     def display(self, FOCUS):
@@ -93,27 +93,35 @@ class Character(Prop):
 
     def __init__(self, name, description):
         super().__init__(name, description)
-        self.topics = {Topic("Greeting","Hi.",[]), Topic("Goodbye","bye", []), Topic("Unknown","What?", [])}
+        self.topics = {}
+        self.topics['Greeting'] = Topic("Greeting","Hi.",[])
+        self.topics['Goodbye'] = Topic("Goodbye","Bye", [])
+        self.topics['Unknown'] = Topic("Unknown","I don't know what you're talking about", [])
+        self.topics['Chat'] = Topic("Chat","This is my standard response", [])
 
     def __str__(self):
         string = "Talk to " + self.name
         return string
 
+    def addTopic(self, topic): #Test this
+        self.topics[topic.name] = topic
+
     def interact(self):
         self.talk()
 
     def talk(self): ## I copy pasted this method, it's fucked. Redo it.
-        print(self.name + ' says, "' + 'Greetz' + '"\n')
+        print(self.name + ' says, "' + self.topics['Greeting'].response + '"\n')
 
         while True:
             found = False
-            
+
+            print("Type 'leave' to leave conversation.")            
             subject = input(self.name + ">>")
 
-            print(subject.lower() + "\n")
-            
+            print(subject.lower() + "\n\n")
+
             if( subject.lower() == "leave"):
-                print('"'+ 'Goodbye'.response + '"')
+                print('"'+ self.topics['Goodbye'].response + '"\n')
                 break
             
             if( subject.lower() == "look"):
@@ -122,10 +130,10 @@ class Character(Prop):
 
             for key in self.topics:
                 if subject.lower() == key.lower():
-                    print('"' + "Topic" + '"')
+                    print('"' + self.topics[key].response + '"\n')
                     found = True
                     break
-                if found == False: print("Come again?\n")
+            if found == False: print('"' + self.topics["Unknown"].response + '"\n')
         '''
         Greeting
         goodbye
