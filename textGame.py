@@ -8,7 +8,14 @@ class TextGame():
 
         #dummy Character
         self.char1 = Character("Tool", "He's an asshole, you can tell.")
+        topic1 = Topic("Shoes", "", [])
+        topic2 = Topic("Chat", "Hey, what do you think of my [shoes]?", [topic1])
+        topic3 = Topic("Shoes", "Oh, THESE old things? I got them Holister", [])
+        self.char1.addTopic(topic2)
+        self.char1.addTopic(topic3)
+        
         self.dahRoom.addChar(self.char1)
+        
 
         #Player
         self.player = Player()
@@ -39,6 +46,48 @@ class TextGame():
         #Parse input to focus
         #Print output from focus
         #loop
+
+    def look(self, player):
+        #Look request
+        return
+
+    def talk(self, player):
+        print(self.FOCUS.name + ' says, "' + self.FOCUS.topics['Greeting'].response + '."\n')
+
+        while True:
+            found = False
+
+            print("Type 'leave' to leave conversation, 'list' to list known topics.")            
+            subject = input(self.FOCUS.name + ">>")
+
+            print(subject.lower() + "\n\n")
+
+            if( subject.lower() == "leave"):
+                print('"'+ self.FOCUS.topics['Goodbye'].response + '."\n')
+                break
+
+            if( subject.lower() == "list"):
+                player.listTopics()
+                found = True
+            
+            if( subject.lower() == "look"):
+                print("You are speaking with " + self.FOCUS.description + "\n")
+                found = True
+
+            for key in self.FOCUS.topics:
+                if subject.lower() == key.lower():
+                    print('"' + self.FOCUS.topics[key].response + '."\n')
+                    for topic in self.FOCUS.topics[key].topics:
+                        player.learn(topic)
+                    found = True
+                    break
+            if found == False: print('"' + self.FOCUS.topics["Unknown"].response + '"\n')
+        
+
+    def use(self, player):
+        #Use request
+        return
+    
     def getInput(self):
         thing = input("--->>")
         return thing
@@ -47,48 +96,16 @@ class TextGame():
         FOCUS.menu()
         
     def mainLoop(self):
-
+        print("Texty-Game\nA simpel text game, by Evan Clement\n")
+        print("You are in ", end = "")
         while True:
             print(self.FOCUS.lookAt() + "\n")
-            #self.display(self.FOCUS)
-            #move = self.getInput()
-            #self.FOCUS.interact(move)
-            print("You know:")
-            self.player.listTopics()
-            if self.player.inLex("love"): print("You know something of love.")
-            else: print("You know nothing of love.")
-            if self.player.inLex("hate"): print("You know something of hate.")
-            else: print("You know nothing of hate.")
+
+            print("You are speaking to Tool.")
             
-            print("\nNow you're learning some things...")
-            self.player.learn(self.hate)
-            self.player.learn(self.love)
-            print("\nNow you know:")
-            self.player.listTopics()
-            if self.player.inLex("love"): print("You know something of love.")
-            else: print("You know nothing of love.")
-            if self.player.inLex("hate"): print("You know something of hate.")
-            else: print("You know nothing of hate.")
+            self.FOCUS = self.char1
+            self.talk(self.player)
             
-            print("\nForgeting 'love'.")
-            self.player.forget("lOvE")
-            print("\nNow you know:")
-            self.player.listTopics()
-            if self.player.inLex("love"): print("You know something of love.")
-            else:print("You know nothing of love.")
-            if self.player.inLex("hate"): print("You know something of hate.")
-            else: print("You know nothing of hate.")
-            
-            print("\nForgeting 'hate'.")
-            self.player.forget("Hate")
-            print("\nNow you know:")
-            self.player.listTopics()
-            if self.player.inLex("love"): print("You know something of love.")
-            else: print("You know nothing of love.")
-            if self.player.inLex("hate"): print("You know something of hate.")
-            else: print("You know nothing of hate.")
-            
-            print("\nNow you are nothing.")
             print("End of game.")
             break
             
@@ -148,45 +165,22 @@ class Character(Prop):
         string = "Talk to " + self.name
         return string
 
-    def addTopic(self, topic): #Test this
+    def addTopic(self, topic):
         self.topics[topic.name] = topic
 
     def interact(self):
         self.talk()
 
-    def talk(self):
-        print(self.name + ' says, "' + self.topics['Greeting'].response + '."\n')
-
-        while True:
-            found = False
-
-            print("Type 'leave' to leave conversation.")            
-            subject = input(self.name + ">>")
-
-            print(subject.lower() + "\n\n")
-
-            if( subject.lower() == "leave"):
-                print('"'+ self.topics['Goodbye'].response + '."\n')
-                break
-            
-            if( subject.lower() == "look"):
-                print("You are speaking with " + self.description + "\n")
-                found = True
-
-            for key in self.topics:
-                if subject.lower() == key.lower():
-                    print('"' + self.topics[key].response + '."\n')
-                    found = True
-                    break
-            if found == False: print('"' + self.topics["Unknown"].response + '"\n')
+    
+    
 
     #States
-        '''
+    '''
         Interact
         Respond
         '''
     #Dictionarys
-        '''
+    '''
         Topics
         inventory
         '''
