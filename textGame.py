@@ -9,8 +9,9 @@ class TextGame():
         #dummy Character
         self.char1 = Character("Tool", "He's an asshole, you can tell.")
         topic1 = Topic("Shoes", "", [])
-        topic2 = Topic("Chat", "Hey, what do you think of my [shoes]?", [topic1])
-        topic3 = Topic("Shoes", "Oh, THESE old things? I got them Holister", [])
+        topic2 = Topic("Chat", "Hey, what do you think of my [shoes]?", [])
+        topic2.addTopic(topic1)
+        topic3 = Topic("Shoes", "Oh, THESE old things? I got them at Holister", [])
         self.char1.addTopic(topic2)
         self.char1.addTopic(topic3)
         
@@ -47,9 +48,41 @@ class TextGame():
         #Print output from focus
         #loop
 
-    def look(self, player):
+    def idle(self, player):
+        #Idle play loop, for in rooms
+        while True:
+            command = input("--->>")
+
+            if command.lower() == "look":
+                command = input("Look at what?\n--->>").lower()
+                for thing in self.FOCUS.props:
+                    if command == thing.name.lower():
+                        self.look(thing)
+                for actor in self.FOCUS.characters:
+                    if command == actor.name.lower():
+                        self.look(player, actor)
+
+            elif command.lower() == "talk":
+                command = input("Talk to who?\n--->>").lower()
+                for thing in self.FOCUS.props:
+                    if command == thing.name.lower():
+                        print("You can't talk to the " + thing)
+                for actor in self.FOCUS.characters:
+                    if command == actor.name.lower():
+                        self.FOCUS = actor
+                        self.talk(player)
+
+            else:
+                print("I don't know what that means.")
+
+        
+
+    def look(self, player, actor = None):
         #Look request
-        return
+        if actor != None:
+            print("You see " + actor.lookAt())
+        else: print("You aren't sure what you're seeing...")
+        
 
     def talk(self, player):
         print(self.FOCUS.name + ' says, "' + self.FOCUS.topics['Greeting'].response + '."\n')
@@ -84,9 +117,9 @@ class TextGame():
             if found == False: print('"' + self.FOCUS.topics["Unknown"].response + '"\n')
         
 
-    def use(self, player):
+    def use(self, player): pass
         #Use request
-        return
+        
     
     def getInput(self):
         thing = input("--->>")
@@ -97,14 +130,10 @@ class TextGame():
         
     def mainLoop(self):
         print("Texty-Game\nA simpel text game, by Evan Clement\n")
-        print("You are in ", end = "")
+        
         while True:
-            print(self.FOCUS.lookAt() + "\n")
 
-            print("You are speaking to Tool.")
-            
-            self.FOCUS = self.char1
-            self.talk(self.player)
+            self.idle(self.player)    
             
             print("End of game.")
             break
@@ -130,7 +159,8 @@ class Room(Prop):
         super().__init__(name, description)
         self.props = []
         self.characters = []
-        self.options = []         
+        self.options = []
+        self.visited = False
         
     def menu(self):
         num = 1
@@ -246,6 +276,20 @@ class Topic():
         string = self.name + " " + self.response
         return string
 
+    def addTopic(self, topic):
+        self.topics.append(topic)
+
+class Exit():
+    #Exits default to unlocked, with no key
+    #These will be checked in Game.use()
+    def __init__(self, direction, destination, locked = False, key = ""):
+        self.direction = direction
+        self.destination = destination
+        self.locked = locked
+
+    def __str__(self):
+        string = self.direction + " goes to " + self.destination
+        return string
 
 
 if __name__ == '__main__':
