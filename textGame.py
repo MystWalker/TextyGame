@@ -55,6 +55,8 @@ class TextGame():
 
             if command.lower() == "look":
                 command = input("Look at what?\n--->>").lower()
+                if command == "room":
+                    self.look(self.player, self.FOCUS)
                 for thing in self.FOCUS.props:
                     if command == thing.name.lower():
                         self.look(thing)
@@ -97,6 +99,7 @@ class TextGame():
 
             if( subject.lower() == "leave"):
                 print('"'+ self.FOCUS.topics['Goodbye'].response + '."\n')
+                self.FOCUS = self.FOCUS.container
                 break
 
             if( subject.lower() == "list"):
@@ -174,6 +177,7 @@ class Room(Prop):
     def addChar(self, character):
         self.characters.append(character)
         self.options.append(character)
+        character.container = self
 
     def addProp(self, prop):
         self.props.append(prop)
@@ -183,8 +187,10 @@ class Room(Prop):
 
 class Character(Prop):
 
-    def __init__(self, name, description):
+    def __init__(self, name, description, container = None):
         super().__init__(name, description)
+        self.container = container
+        
         self.topics = {}
         self.topics['Greeting'] = Topic("Greeting","Hi",[])
         self.topics['Goodbye'] = Topic("Goodbye","Bye", [])
@@ -198,8 +204,6 @@ class Character(Prop):
     def addTopic(self, topic):
         self.topics[topic.name] = topic
 
-    def interact(self):
-        self.talk()
 
     
     
